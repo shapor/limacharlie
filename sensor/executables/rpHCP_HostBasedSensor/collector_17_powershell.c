@@ -18,12 +18,12 @@ limitations under the License.
 #include <librpcm/librpcm.h>
 #include "collectors.h"
 #include <notificationsLib/notificationsLib.h>
-#include <libOs/libOs.h>
 #include <rpHostCommonPlatformLib/rTags.h>
 
 #define RPAL_FILE_ID          100
 
-
+#define _EVENT_BUFFER_SIZE      (10 * 1024)
+static RPU8 g_event_buffer = NULL;
 
 static
 RPVOID
@@ -35,10 +35,36 @@ RPVOID
 {
     UNREFERENCED_PARAMETER( ctx );
 
+#ifdef RPAL_PLATFORM_WINDOWS
+    HANDLE hEventLog = NULL;
+    RWCHAR logName[] = _WCH( "Windows PowerShell" );
+
+    if( NULL == ( hEventLog = OpenEventLogW( NULL, logName ) ) )
+    {
+        rpal_debug_warning( "could not open event log" );
+        return NULL;
+    }
+
+    if( NULL == ( g_event_buffer = rpal_memory_alloc( _EVENT_BUFFER_SIZE ) ) )
+    {
+        return NULL;
+    }
+
     while( !rEvent_wait( isTimeToStop, MSEC_FROM_SEC( 5 ) ) )
     {
-        
+        while( !rEvent_wait( isTimeToStop, 0 ) &&
+            ReadEventLogW( hEventLog, EVENTLOG_SEQUENTIAL_READ, 0,  ) )
+        {
+
+        }
     }
+
+    CloseEventLog( hEventLog );
+    rpal_memory_free( g_event_buffer );
+
+#else
+    UNREFERENCED_PARAMETER( isTimeToStop );
+#endif
 
     return NULL;
 }
