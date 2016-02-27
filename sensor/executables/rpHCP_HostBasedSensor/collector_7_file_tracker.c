@@ -79,7 +79,8 @@ RPVOID
         NULL != ( watch = rDirWatch_new( root, 
                                          RPAL_DIR_WATCH_CHANGE_CREATION |
                                          RPAL_DIR_WATCH_CHANGE_FILE_NAME | 
-                                         RPAL_DIR_WATCH_CHANGE_LAST_ACCESS, 
+                                         RPAL_DIR_WATCH_CHANGE_LAST_ACCESS |
+                                         RPAL_DIR_WATCH_CHANGE_LAST_WRITE,
                                          TRUE ) ) )
     {
         while( rpal_memory_isValid( isTimeToStop ) &&

@@ -1604,14 +1604,17 @@ RBOOL
     )
 {
     RBOOL isEndsWith = FALSE;
+    RU32 needleLen = 0;
     
     if( NULL != haystack &&
         NULL != needle )
     {
+        needleLen = rpal_string_strlen( needle );
+
         if( 0 == rpal_memory_memcmp( haystack + rpal_string_strlen( haystack ) - 
-                                                rpal_string_strlen( needle ), 
+                                     needleLen,
                                      needle, 
-                                     rpal_string_strlen( needle ) * sizeof( RCHAR ) ) )
+                                     needleLen * sizeof( RCHAR ) ) )
         {
             isEndsWith = TRUE;
         }
@@ -1628,14 +1631,17 @@ RBOOL
     )
 {
     RBOOL isEndsWith = FALSE;
+    RU32 needleLen = 0;
     
     if( NULL != haystack &&
         NULL != needle )
     {
+        needleLen = rpal_string_strlenw( needle );
+
         if( 0 == rpal_memory_memcmp( haystack + rpal_string_strlenw( haystack ) - 
-                                                rpal_string_strlenw( needle ), 
+                                     needleLen,
                                      needle, 
-                                     rpal_string_strlenw( needle ) * sizeof( RWCHAR ) ) )
+                                     needleLen * sizeof( RWCHAR ) ) )
         {
             isEndsWith = TRUE;
         }
@@ -1644,6 +1650,71 @@ RBOOL
     return isEndsWith;
 }
 
+RBOOL
+    rpal_string_iendswitha
+    (
+        RPCHAR haystack,
+        RPCHAR needle
+    )
+{
+    RBOOL isEndsWith = FALSE;
+    RPCHAR tmpHaystack = NULL;
+    RPCHAR tmpNeedle = NULL;
+
+    if( NULL != haystack &&
+        NULL != needle )
+    {
+        if( NULL != ( tmpHaystack = rpal_string_strdupa( haystack ) ) )
+        {
+            if( NULL != ( tmpNeedle = rpal_string_strdupa( needle ) ) )
+            {
+                rpal_string_tolowera( tmpHaystack );
+                rpal_string_tolowera( tmpNeedle );
+
+                isEndsWith = rpal_string_endswitha( tmpHaystack, tmpNeedle );
+
+                rpal_memory_free( tmpNeedle );
+            }
+
+            rpal_memory_free( tmpHaystack );
+        }
+    }
+
+    return isEndsWith;
+}
+
+RBOOL
+    rpal_string_iendswithw
+    (
+        RPWCHAR haystack,
+        RPWCHAR needle
+    )
+{
+    RBOOL isEndsWith = FALSE;
+    RPWCHAR tmpHaystack = NULL;
+    RPWCHAR tmpNeedle = NULL;
+
+    if( NULL != haystack &&
+        NULL != needle )
+    {
+        if( NULL != ( tmpHaystack = rpal_string_strdupw( haystack ) ) )
+        {
+            if( NULL != ( tmpNeedle = rpal_string_strdupw( needle ) ) )
+            {
+                rpal_string_tolowerw( tmpHaystack );
+                rpal_string_tolowerw( tmpNeedle );
+
+                isEndsWith = rpal_string_endswithw( tmpHaystack, tmpNeedle );
+
+                rpal_memory_free( tmpNeedle );
+            }
+
+            rpal_memory_free( tmpHaystack );
+        }
+    }
+
+    return isEndsWith;
+}
 
 RBOOL
     rpal_string_trima

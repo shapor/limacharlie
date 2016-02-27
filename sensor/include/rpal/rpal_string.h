@@ -342,6 +342,20 @@ RBOOL
     );
 
 RBOOL
+    rpal_string_iendswitha
+    (
+        RPCHAR haystack,
+        RPCHAR needle
+    );
+
+RBOOL
+    rpal_string_iendswithw
+    (
+        RPWCHAR haystack,
+        RPWCHAR needle
+    );
+
+RBOOL
     rpal_string_trima
     (
         RPCHAR str,

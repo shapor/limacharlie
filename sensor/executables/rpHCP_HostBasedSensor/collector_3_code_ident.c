@@ -393,6 +393,52 @@ RVOID
     }
 }
 
+static
+RVOID
+    processFileAccess
+    (
+        rpcm_tag notifType,
+        rSequence event
+    )
+{
+    RPWCHAR filePathW = NULL;
+    RPCHAR filePathA = NULL;
+    CryptoLib_Hash hash = { 0 };
+    RBOOL isDoProcess = FALSE;
+
+    UNREFERENCED_PARAMETER( notifType );
+
+    if( rpal_memory_isValid( event ) )
+    {
+        if( rSequence_getSTRINGW( event, RP_TAGS_FILE_PATH, &filePathW ) ||
+            rSequence_getSTRINGA( event, RP_TAGS_FILE_PATH, &filePathA ) )
+        {
+            // First type of file we're interested in is the .lnk files on Windows.
+#ifdef RPAL_PLATFORM_WINDOWS
+            RWCHAR lnkFile[] = _WCH( ".lnk" );
+            if( rpal_string_iendswithw( filePathW, lnkFile ) )
+            {
+                isDoProcess = TRUE;
+            }
+#endif
+
+            if( isDoProcess )
+            {
+                if( NULL != filePathW )
+                {
+                    CryptoLib_hashFileW( filePathW, &hash, TRUE );
+                    processCodeIdentW( filePathW, &hash, 0, event );
+                }
+                else if( NULL != filePathA )
+                {
+                    CryptoLib_hashFileA( filePathA, &hash, TRUE );
+                    processCodeIdentA( filePathA, &hash, 0, event );
+                }
+            }
+        }
+    }
+}
+
 //=============================================================================
 // COLLECTOR INTERFACE
 //=============================================================================
@@ -426,7 +472,8 @@ RBOOL
                     notifications_subscribe( RP_TAGS_NOTIFICATION_OS_SERVICES_REP, NULL, 0, NULL, processGenericSnapshot ) &&
                     notifications_subscribe( RP_TAGS_NOTIFICATION_OS_DRIVERS_REP, NULL, 0, NULL, processGenericSnapshot ) &&
                     notifications_subscribe( RP_TAGS_NOTIFICATION_OS_PROCESSES_REP, NULL, 0, NULL, processGenericSnapshot ) &&
-                    notifications_subscribe( RP_TAGS_NOTIFICATION_OS_AUTORUNS_REP, NULL, 0, NULL, processGenericSnapshot ) )
+                    notifications_subscribe( RP_TAGS_NOTIFICATION_OS_AUTORUNS_REP, NULL, 0, NULL, processGenericSnapshot ) &&
+                    notifications_subscribe( RP_TAGS_NOTIFICATION_FILE_MODIFIED, NULL, 0, NULL, processFileAccess ) )
                 {
                     isSuccess = TRUE;
                 }
@@ -441,6 +488,7 @@ RBOOL
                     notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_DRIVERS_REP, NULL, processGenericSnapshot );
                     notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_PROCESSES_REP, NULL, processGenericSnapshot );
                     notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_AUTORUNS_REP, NULL, processGenericSnapshot );
+                    notifications_unsubscribe( RP_TAGS_NOTIFICATION_FILE_MODIFIED, NULL, processFileAccess );
                     rpal_bloom_destroy( g_knownCode );
                     rMutex_free( g_mutex );
                     g_mutex = NULL;
@@ -479,6 +527,7 @@ RBOOL
             notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_DRIVERS_REP, NULL, processGenericSnapshot ) &&
             notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_PROCESSES_REP, NULL, processGenericSnapshot ) &&
             notifications_unsubscribe( RP_TAGS_NOTIFICATION_OS_AUTORUNS_REP, NULL, processGenericSnapshot ) )
+            notifications_unsubscribe( RP_TAGS_NOTIFICATION_FILE_MODIFIED, NULL, processFileAccess );
         {
             isSuccess = TRUE;
         }

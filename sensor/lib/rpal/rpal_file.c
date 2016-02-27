@@ -62,7 +62,7 @@ typedef struct
 {
 #ifdef RPAL_PLATFORM_WINDOWS
     HANDLE hDir;
-    RU8 changes[ 64 * 1024 ];
+    RU8 changes[ 128 * 1024 ];
     FILE_NOTIFY_INFORMATION* curChange;
     HANDLE hChange;
     RBOOL includeSubDirs;
