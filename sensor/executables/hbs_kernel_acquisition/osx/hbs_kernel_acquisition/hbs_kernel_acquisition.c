@@ -84,10 +84,12 @@ int
 //  Dispatcher
 //=========================================================================
 static CollectorContext g_collectors[] = { _COLLECTOR_INIT( 1 ),
-                                           _COLLECTOR_INIT( 2 ) };
+                                           _COLLECTOR_INIT( 2 ),
+                                           _COLLECTOR_INIT( 3 ) };
 static collector_task g_tasks[] = { task_ping,
                                     task_get_new_processes,
-                                    task_get_new_fileio };
+                                    task_get_new_fileio,
+                                    task_get_new_connection };
 
 static
 int

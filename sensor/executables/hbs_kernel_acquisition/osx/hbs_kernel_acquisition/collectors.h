@@ -32,8 +32,10 @@ int collector_ ## cId ## _deinitialize();
 
 _DECLARE_COLLECTOR( 1 );
 _DECLARE_COLLECTOR( 2 );
+_DECLARE_COLLECTOR( 3 );
 _DECLARE_TASK( task_get_new_processes );
 _DECLARE_TASK( task_get_new_fileio );
+_DECLARE_TASK( task_get_new_connection );
 
 
 
