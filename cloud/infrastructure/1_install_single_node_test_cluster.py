@@ -53,7 +53,7 @@ printStep( 'Installing some basic packages required for Beach (mainly).',
     os.system( 'apt-get install python-pip python-dev debconf-utils python-m2crypto python-pexpect python-mysqldb autoconf libtool git flex -y' ) )
 
 printStep( 'Installing Beach.',
-    os.system( 'pip install beach' ) )
+    os.system( 'pip install beach==0.4.3.1' ) )
 
 printStep( 'Installing JRE for Cassandra (the hcp-scale-db)',
     os.system( 'apt-get install default-jre-headless -y' ) )
